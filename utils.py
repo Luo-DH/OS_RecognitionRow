@@ -30,8 +30,11 @@ class COLOR_BOUNDARY(Enum):
     GREEN_LOWER_BOUNDARY = (0, 150, 0)
     GREEN_UPPER_BOUNDARY = (100, 255, 100)
 
+    MAX_BOUNDARY = (255, 255, 255)
+
 
 class DIRECTION(Enum):
 
     LEFT = 0
     RIGHT = 1
+    OTHER = 2

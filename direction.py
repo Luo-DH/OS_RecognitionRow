@@ -27,13 +27,27 @@ class JudgeDirection:
     """
 
     def __init__(self, image):
-        self.image = image
+        self.image = cv2.medianBlur(image, 5)
+
+    @staticmethod
+    def __getPixelNum(image):
+        return len(image[image[:, :] == 255])
 
     @staticmethod
     def __getBoxArea(img):
         _, _, w, h = cv2.boundingRect(img)
         return w * h
 
+    def __otherDirection(func):
+        def inner(self):
+            if self.__getPixelNum(self.image) < 25:
+                return DIRECTION.OTHER
+            else:
+                return func(self)
+        return inner
+
+
+    @__otherDirection
     def judgeDirection(self):
         """
         判断图片中箭头的方向

@@ -43,7 +43,7 @@ class RecognizeColor:
 
     @staticmethod
     def __getBox(image):
-        image, contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
         maxArea = 400
         index = 0
@@ -54,10 +54,10 @@ class RecognizeColor:
                 index = i
         if index == 0 and maxArea == 400:
             (x, y, w, h) = cv2.boundingRect(image)
-            return image[y: y+h, x: x+w]
+            return image[y: y + h, x: x + w]
 
         (x, y, w, h) = cv2.boundingRect(contours[index])
-        return image[y: y+h, x: x+w]
+        return image[y: y + h, x: x + w]
 
     def recognizeColor(self) -> (bool, COLOR, numpy):
         """判断颜色方法
@@ -74,14 +74,17 @@ class RecognizeColor:
         red_nums = self.__getPixelNum(img_red)
         green_nums = self.__getPixelNum(img_green)
 
-        self.color = (COLOR.RED if(red_nums > green_nums) else COLOR.GREEN) if(red_nums != green_nums) else COLOR.OTHER
+        self.color = (COLOR.RED if (red_nums > green_nums) else COLOR.GREEN) if (
+                red_nums != green_nums) else COLOR.OTHER
 
         if red_nums != 0 or green_nums != 0:
             self.ret = True
         elif red_nums == green_nums:
             self.ret = False
 
-        self.img = self.__getBox(img_red) if(self.color == COLOR.RED) else self.__getBox(img_green)
+        self.img = (self.__getBox(img_red) if (self.color == COLOR.RED) else self.__getBox(img_green)) \
+            if (self.color != COLOR.OTHER) else cv2.inRange(self.frame[0: 5, 0: 5], COLOR_BOUNDARY.MAX_BOUNDARY.value,
+                                                            COLOR_BOUNDARY.MAX_BOUNDARY.value)
 
         return self.ret, self.color, self.img
 
@@ -90,7 +93,6 @@ class RecognizeColor:
 # 测试方法
 ##########################
 if __name__ == '__main__':
-
     img = cv2.imread("../img/RedRight.png")
 
     ret, color, image = RecognizeColor(img).recognizeColor()
