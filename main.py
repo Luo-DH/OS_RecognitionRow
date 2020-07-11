@@ -46,6 +46,7 @@ if __name__ == '__main__':
     # ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 
     try:
+        results = []
         while True:
 
             ret, frame = capture.read()
@@ -58,6 +59,8 @@ if __name__ == '__main__':
 
             # 与下位机通信
             result = mySer.AnalysisData(ret_, color_, dirt_).analysisData()
+
+            results.append(result)
 
             # ser.write(result.encode())
 

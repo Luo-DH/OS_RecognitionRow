@@ -66,13 +66,14 @@ class RecognizeColor:
         > 两张二值图比较白色部分大小，相对较大的为该种颜色
 
         """
-        img_red = cv2.inRange(self.frame, COLOR_BOUNDARY.RED_LOWER_BOUNDARY.value,
-                              COLOR_BOUNDARY.RED_UPPER_BOUNDARY.value)
-        img_green = cv2.inRange(self.frame, COLOR_BOUNDARY.GREEN_LOWER_BOUNDARY.value,
-                                COLOR_BOUNDARY.GREEN_UPPER_BOUNDARY.value)
+        b, g, r = cv2.split(self.frame)
+        img_red = r - g
+        img_green = g - r
+        _, red = cv2.threshold(img_red, 127, 255, cv2.THRESH_BINARY)
+        _, green = cv2.threshold(img_green, 127, 255, cv2.THRESH_BINARY)
 
-        red_nums = self.__getPixelNum(img_red)
-        green_nums = self.__getPixelNum(img_green)
+        red_nums = self.__getPixelNum(red)
+        green_nums = self.__getPixelNum(green)
 
         self.color = (COLOR.RED if (red_nums > green_nums) else COLOR.GREEN) if (
                 red_nums != green_nums) else COLOR.OTHER
