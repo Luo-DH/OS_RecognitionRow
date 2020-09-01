@@ -25,6 +25,7 @@
 #   - 通信
 ##########################
 import cv2
+import numpy
 import serial
 
 import color
@@ -51,8 +52,13 @@ if __name__ == '__main__':
 
             ret, frame = capture.read()
 
+            frame = cv2.imread("../img/GreenLeft.png")
+            # rows, cols, channels = frame.shape
+            # blank = numpy.ones([rows, cols, channels], frame.dtype)*255
+            # frame = cv2.addWeighted(frame, 0.5, blank, 0.5, 3)
+            # frame = numpy.uint8(numpy.clip((1.5*frame+10), 0, 255))
             # 识别颜色
-            ret_, color_, image_ = color.RecognizeColor(frame).recognizeColor()
+            ret_, color_, image_, red, green = color.RecognizeColor(frame).recognizeColor()
 
             # 判断方向
             dirt_ = direction.JudgeDirection(image_).judgeDirection()
@@ -65,8 +71,7 @@ if __name__ == '__main__':
             # ser.write(result.encode())
 
             print(ret_.__str__() + " " + color_.__str__() + " " + dirt_.__str__() + " " + result)
-            cv2.imshow("frame", frame)
-            cv2.imshow("image", image_)
+
 
             # cv2.imshow("frame", frame)
             # if image_.shape[0] != 0:

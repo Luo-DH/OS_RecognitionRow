@@ -33,6 +33,7 @@ class RecognizeColor:
     """
 
     def __init__(self, frame):
+
         self.color = COLOR.OTHER
         self.ret = False
         self.frame = frame
@@ -43,7 +44,11 @@ class RecognizeColor:
 
     @staticmethod
     def __getBox(image):
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        image = cv2.dilate(image, kernel)  # 膨胀图像
         contours, hierarchy = cv2.findContours(image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.imshow("getBox", image)
+        cv2.waitKey(1)
 
         maxArea = 400
         index = 0
@@ -67,13 +72,15 @@ class RecognizeColor:
 
         """
         b, g, r = cv2.split(self.frame)
-        img_red = r - g
-        img_green = g - r
-        _, red = cv2.threshold(img_red, 127, 255, cv2.THRESH_BINARY)
-        _, green = cv2.threshold(img_green, 127, 255, cv2.THRESH_BINARY)
+        img_red = cv2.subtract(r, g)
+        img_green = cv2.subtract(g, r)
+        _, img_red = cv2.threshold(img_red, 40, 255, cv2.THRESH_BINARY)
+        _, img_green = cv2.threshold(img_green, 40, 255, cv2.THRESH_BINARY)
+        # img_green = cv2.inRange(cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV), COLOR_BOUNDARY.GREEN_UPPER_BOUNDARY.value,
+        #                         COLOR_BOUNDARY.RED_UPPER_BOUNDARY.value)
 
-        red_nums = self.__getPixelNum(red)
-        green_nums = self.__getPixelNum(green)
+        red_nums = self.__getPixelNum(img_red)
+        green_nums = self.__getPixelNum(img_green)
 
         self.color = (COLOR.RED if (red_nums > green_nums) else COLOR.GREEN) if (
                 red_nums != green_nums) else COLOR.OTHER
@@ -87,16 +94,16 @@ class RecognizeColor:
             if (self.color != COLOR.OTHER) else cv2.inRange(self.frame[0: 5, 0: 5], COLOR_BOUNDARY.MAX_BOUNDARY.value,
                                                             COLOR_BOUNDARY.MAX_BOUNDARY.value)
 
-        return self.ret, self.color, self.img
+        return self.ret, self.color, self.img, img_red, img_green
 
 
 ##########################
 # 测试方法
 ##########################
 if __name__ == '__main__':
-    img = cv2.imread("../img/RedRight.png")
+    img = cv2.imread("../img/GreenLeft.png")
 
-    ret, color, image = RecognizeColor(img).recognizeColor()
+    ret, color, image, red, green = RecognizeColor(img).recognizeColor()
     print(color)
 
     cv2.imshow("img", image)

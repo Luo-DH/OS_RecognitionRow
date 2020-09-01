@@ -27,6 +27,7 @@ class JudgeDirection:
     """
 
     def __init__(self, image):
+        _, image = cv2.threshold(image, 127, 255, cv2.THRESH_BINARY)
         self.image = cv2.medianBlur(image, 5)
 
     @staticmethod
@@ -35,7 +36,9 @@ class JudgeDirection:
 
     @staticmethod
     def __getBoxArea(img):
-        _, _, w, h = cv2.boundingRect(img)
+        x, y, w, h = cv2.boundingRect(img)
+        cv2.imshow("img", img[y:y+h, x: x+w])
+        cv2.waitKey(0)
         return w * h
 
     def __otherDirection(func):
